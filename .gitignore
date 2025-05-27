@@ -176,3 +176,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#filtering output
+unsuccessful_transaction.csv
