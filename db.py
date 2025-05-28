@@ -1,24 +1,12 @@
-import psycopg2
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import Base
 
-# Singleton to reuse the same connection across instances
-class Db:
-    _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Db, cls).__new__(cls)
-            cls._instance.conn = cls._create_conn()
-        return cls._instance
+DATABASE_URL = "postgresql+psycopg2://username:password@localhost:5432/your_database" #TODO: put actual databse URL here
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
 
-    @staticmethod
-    def _create_conn():
-        return psycopg2.connect(
-            dbname='bank',
-            user='postgres',
-            password='root',
-            host='localhost',
-            port='5432'
-        )
 
-    def get_conn(self):
-        return self.conn
+def init_db():
+    Base.metadata.create_all(bind=engine)

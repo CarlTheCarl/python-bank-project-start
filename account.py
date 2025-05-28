@@ -5,7 +5,7 @@
 # has currency
 import random
 
-from db import Db
+from db_old import Db
 from transaction import Transaction
 
 

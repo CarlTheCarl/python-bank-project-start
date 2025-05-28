@@ -4,3 +4,6 @@
 * Pandas 2.2.3 or higher
 * Psycopg2 2.9.10 or higher
 * SQLAlchemy 2.0.41 or higher
+
+## other requirements
+* PostgreSQL server
