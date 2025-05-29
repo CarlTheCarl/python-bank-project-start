@@ -7,3 +7,7 @@
 
 ## other requirements
 * PostgreSQL server
+
+# onboarding
+1. in db.py replace the string in DATABASE_URL with your postgreSQL url
+2. do the same for sqlalchemy.url inside alembic.ini

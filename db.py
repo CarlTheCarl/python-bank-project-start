@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from models import Base
 
 
-DATABASE_URL = "postgresql+psycopg2://username:password@localhost:5432/your_database" #TODO: put actual databse URL here
+DATABASE_URL = "postgresql+psycopg2://postgres:password123@localhost:5432/sebank" #replace this bit with the url to your actual postgreSQL server
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
