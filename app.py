@@ -1,6 +1,5 @@
 from db import init_db, SessionLocal
 from models import Transactions, Account
-from sqlalchemy.exc import SQLAlchemyError
 import csv
 import great_expectations as gx
 import pandas as pd
@@ -57,6 +56,7 @@ def main():
 
             if row.isna().any(): #checks if any of the columns are empty
                 row['error notes'] = "missing data"
+                # progress_bar(index, 1000)
                 bar()
                 continue
             #end of timestamp empty check
