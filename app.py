@@ -11,6 +11,7 @@ from alive_progress import alive_bar
 warnings.filterwarnings("ignore", message="`result_format` configured at the Validator-level*")
 
 
+
 # def progress_bar(current, percent):
 #     temp_count = int(current / percent)
 #     bar_percent = int(temp_count / 10)
