@@ -6,9 +6,9 @@
 * Psycopg2 2.9.10 or higher
 * SQLAlchemy 2.0.41 or higher
 
-## other requirements
+## Other requirements
 * PostgreSQL server
 
-# onboarding
+# Onboarding
 1. in db.py replace the string in DATABASE_URL with your postgreSQL url
 2. do the same for sqlalchemy.url inside alembic.ini

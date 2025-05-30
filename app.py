@@ -1,3 +1,7 @@
+from db import init_db, SessionLocal
+from models import Transactions, Account
+from sqlalchemy.exc import SQLAlchemyError
+import csv
 import great_expectations as gx
 import pandas as pd
 import warnings
@@ -100,6 +104,8 @@ def main():
                 #progress_bar(index, 1000)
                 bar()
                 continue
+
+
             valid_rows.append(row)
             bar()
 
@@ -114,34 +120,79 @@ def main():
     #=== Outputting data ===#
     transaction_error_df.to_csv('data/unsuccessful_transaction.csv',mode='w', header=False, sep=';', decimal =',', index=False)
 
-    # Create the ephemeral GX context
-    context = gx.get_context()
+    # # Create the ephemeral GX context
+    # context = gx.get_context()
+    #
+    # # Add a pandas datasource
+    # data_source = context.data_sources.add_pandas(name="pandas")
+    #
+    # # Add a dataframe asset
+    # data_asset = data_source.add_dataframe_asset(name="transactions_data")
+    #
+    # # Define the batch (entire DataFrame)
+    # batch_definition = data_asset.add_batch_definition_whole_dataframe(name="batch_def")
+    # batch = batch_definition.get_batch(batch_parameters={"dataframe": transaction_df})
+    #
+    # # Create the expectation suite with a name
+    # suite = gx.core.expectation_suite.ExpectationSuite(name="transactions_suite")
+    #
+    # # Get the validator using the suite
+    # validator = context.get_validator(batch=batch, expectation_suite=suite)
+    #
+    # # Add expectations
+    # validator.expect_column_values_to_be_between("amount", min_value=0.01, max_value=100000)
+    # validator.expect_column_values_to_not_be_null("timestamp")
+    #
+    # # Validate
+    # results = validator.validate()
+    #
+    # # Print results
+    # print(results)
 
-    # Add a pandas datasource
-    data_source = context.data_sources.add_pandas(name="pandas")
+    init_db()
+    db = SessionLocal()
 
-    # Add a dataframe asset
-    data_asset = data_source.add_dataframe_asset(name="transactions_data")
+    try:
+        with db.begin():
+            for _, row in account_df.itterows():
+                account = Account(
+                    customer_name=row['CustomerName'],
+                    address=row['Address'],
+                    phone_number=row['PhoneNumber'],
+                    person_number=row['Personnummer'],
+                    account_number=row['BankAccount']
+                )
+                db.merge(account)
 
-    # Define the batch (entire DataFrame)
-    batch_definition = data_asset.add_batch_definition_whole_dataframe(name="batch_def")
-    batch = batch_definition.get_batch(batch_parameters={"dataframe": transaction_df})
+            db.commit()
 
-    # Create the expectation suite with a name
-    suite = gx.core.expectation_suite.ExpectationSuite(name="transactions_suite")
+            for _, row in transaction_df.iterrows():
+                transaction = Transactions(
+                transaction_id=row['transaction_id'],
+                timestamp=row['timestamp'],
+                amount=row['amount'],
+                currency=row['currency'],
+                sender_account=row['sender_account'],
+                receiver_account=row['receiver_account'],
+                sender_country=row['sender_country'],
+                sender_municipality=row['sender_municipality'],
+                receiver_country=row['receiver_country'],
+                receiver_municipality=row['receiver_municipality'],
+                transaction_type=row['transaction_type'],
+                notes=row['notes']
+            )
+                db.add(transaction)
 
-    # Get the validator using the suite
-    validator = context.get_validator(batch=batch, expectation_suite=suite)
+            db.commit()
 
-    # Add expectations
-    validator.expect_column_values_to_be_between("amount", min_value=0.01, max_value=100000)
-    validator.expect_column_values_to_not_be_null("timestamp")
-
-    # Validate
-    results = validator.validate()
-
-    # Print results
-    print(results)
+            print("Data upload successful.")
+            print(f"accounts added: {len(account_df)}")
+            print(f"transactions added: {len(transaction_df)}")
+    except SQLAlchemyError as e:
+        db.rollback()
+        print("[ERROR] data not uploaded, rolling back. Error Code: ", e)
+    finally:
+        db.close()
 
 if __name__ == '__main__':
     main()
