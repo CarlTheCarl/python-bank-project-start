@@ -10,7 +10,12 @@ from datetime import datetime, date
 from alive_progress import alive_bar
 warnings.filterwarnings("ignore", message="`result_format` configured at the Validator-level*")
 
-
+sus_country_list = ["Afghanistan", "American Samoa" , "The Bahamas",
+                    "Botswana","Democratic People's Republic of Korea","Ethiopia",
+                    "Ghana","Guam", "Iran", "Iraq","Libya","Nigeria", "Pakistan",
+                    "Panama","Puerto Rico", "Samoa", "Saudi Arabia","Sri Lanka",
+                    "Syria", "Trinidad and Tobago","Tunisia", "US Virgin Islands", "Yemen"]
+# source for list: https://ec.europa.eu/commission/presscorner/detail/en/ip_19_781
 
 # def progress_bar(current, percent):
 #     temp_count = int(current / percent)
@@ -106,6 +111,19 @@ def main():
                 bar()
                 continue
 
+            if row["sender_country"] in sus_country_list:
+                row["error notes"] = f"suspicious sender country {row["sender_country"]}, held for manual review"
+                error_rows.append(row)
+                # progress_bar(index, 1000)
+                bar()
+                continue
+
+            elif row["receiver_country"] in sus_country_list:
+                row["error notes"] = f"suspicious receiver country {row["receiver_country"]}, held for manual review"
+                error_rows.append(row)
+                # progress_bar(index, 1000)
+                bar()
+                continue
 
             valid_rows.append(row)
             bar()
